@@ -13,7 +13,8 @@ import model.Time;
 
 public class RestService {
 
-	public String getTime(String timezone) {
+	public String getTime(String timezone) { //propably should return model.Time (not String)
+												//but in this simple app I think it's ok 
 		String url = "http://worldtimeapi.org/api/timezone/" + timezone;
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -26,16 +27,15 @@ public class RestService {
 			String responseBody = scanner.useDelimiter("\\A").next();
 			scanner.close();
 
-			Gson g = new Gson();
+			Gson g = new Gson(); //external library used for deserialization
 			Time time = g.fromJson(responseBody, Time.class);
 			String dateTime = time.getDatetime();
 			String formatedDateTime = dateTime.replace('T', ' ').substring(0, dateTime.indexOf('+'));
 			return formatedDateTime;
 
 		} catch (MalformedURLException e) {
-			printTimezones();
 			return "bad url";
-		} catch (IOException e) {
+		} catch (IOException e) { //happens if no internet connection or api is off
 			return "can't connect to the server";
 		}
 
