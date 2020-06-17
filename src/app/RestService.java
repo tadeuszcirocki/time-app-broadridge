@@ -2,6 +2,7 @@ package app;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
@@ -15,22 +16,29 @@ public class RestService {
 	public String getTime(String timezone) {
 		String url = "http://worldtimeapi.org/api/timezone/" + timezone;
 		try {
-			InputStream response = new URL(url).openStream();
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			if (connection.getResponseCode() == 404) {
+				printTimezones();
+				return "wrong timezone. valid ones^";
+			}
+			InputStream response = connection.getInputStream();
 			Scanner scanner = new Scanner(response);
 			String responseBody = scanner.useDelimiter("\\A").next();
 			scanner.close();
 
 			Gson g = new Gson();
 			Time time = g.fromJson(responseBody, Time.class);
-			return time.getDatetime();
+			String dateTime = time.getDatetime();
+			String formatedDateTime = dateTime.replace('T', ' ').substring(0, dateTime.indexOf('+'));
+			return formatedDateTime;
+
 		} catch (MalformedURLException e) {
-			//e.printStackTrace();
 			printTimezones();
-			return "WRONG here's valid timezones^";
+			return "bad url";
 		} catch (IOException e) {
-			//e.printStackTrace();
 			return "can't connect to the server";
 		}
+
 	}
 
 	public String[] getTimezones() {
