@@ -10,10 +10,10 @@ public class Run {
 			+ " CONFIRM WITH ENTER \n";
 
 	public static void main(String[] args) {
-		ConsoleRun();
+		consoleRun();
 	}
 
-	private static void ConsoleRun() {
+	private static void consoleRun() {
 		ApiService service = new ApiService();
 		Scanner scan = new Scanner(System.in);
 		Time time;
