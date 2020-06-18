@@ -15,19 +15,6 @@ public class ApiService { //service for worldtimeapi.org
 
 	private final String URL = "http://worldtimeapi.org/api";
 
-	public String getFormatedDateTime(Time time) {
-		String dateTime = time.getDatetime();
-		String formatedDateTime = dateTime.replace('T', ' ').substring(0, dateTime.indexOf('+'));
-		return formatedDateTime;
-	}
-
-	public Time getTime(String timezone) throws Exception {
-		String url = URL + "/timezone/" + timezone;
-		String json = getResponse(url);
-		Time time = DeserializeToTime(json);
-		return time;
-	}
-
 	private String getResponse(String url) throws Exception {
 		HttpURLConnection connection;
 		InputStream response;
@@ -48,10 +35,23 @@ public class ApiService { //service for worldtimeapi.org
 		}
 	}
 
+	public Time getTime(String timezone) throws Exception {
+		String url = URL + "/timezone/" + timezone;
+		String json = getResponse(url);
+		Time time = DeserializeToTime(json);
+		return time;
+	}
+
 	private Time DeserializeToTime(String json) {
 		Gson g = new Gson();
 		Time time = g.fromJson(json, Time.class);
 		return time;
+	}
+
+	public String getFormatedDateTime(Time time) {
+		String dateTime = time.getDatetime();
+		String formatedDateTime = dateTime.replace('T', ' ').substring(0, dateTime.indexOf('+'));
+		return formatedDateTime;
 	}
 
 	public String[] getTimezones() throws Exception {

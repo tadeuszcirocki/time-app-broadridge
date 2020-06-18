@@ -16,12 +16,12 @@ public class Run {
 	private static void ConsoleRun() {
 		ApiService service = new ApiService();
 		Scanner scan = new Scanner(System.in);
+		Time time;
 
 		System.out.print(MSG);
 
 		String input = scan.next();
 		while (!input.equals("exit")) {
-			Time time;
 			try {
 				time = service.getTime(input);
 				System.out.println(service.getFormatedDateTime(time));
