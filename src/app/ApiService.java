@@ -11,34 +11,49 @@ import com.google.gson.Gson;
 
 import model.Time;
 
-public class RestService {
+public class ApiService { //service for worldtimeapi.org
 
-	public String getTime(String timezone) { //propably should return model.Time (not String)
-												//but in this simple app I think it's ok 
-		String url = "http://worldtimeapi.org/api/timezone/" + timezone;
+	private final String URL = "http://worldtimeapi.org/api";
+
+	public String getFormatedDateTime(Time time) {
+		String dateTime = time.getDatetime();
+		String formatedDateTime = dateTime.replace('T', ' ').substring(0, dateTime.indexOf('+'));
+		return formatedDateTime;
+	}
+
+	public Time getTime(String timezone) throws Exception {
+		String url = URL + "/timezone/" + timezone;
+		String json = getResponseJson(url);
+		Time time = DeserializeToTime(json);
+		return time;
+	}
+
+	private String getResponseJson(String url) throws Exception {
+		HttpURLConnection connection;
+		InputStream response;
 		try {
-			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			connection = (HttpURLConnection) new URL(url).openConnection();
 			if (connection.getResponseCode() == 404) {
-				printTimezones();
-				return "wrong timezone. valid ones^";
+				throw new Exception("Not found");
 			}
-			InputStream response = connection.getInputStream();
+			response = connection.getInputStream();
 			Scanner scanner = new Scanner(response);
 			String responseBody = scanner.useDelimiter("\\A").next();
 			scanner.close();
-
-			Gson g = new Gson(); //external library used for deserialization
-			Time time = g.fromJson(responseBody, Time.class);
-			String dateTime = time.getDatetime();
-			String formatedDateTime = dateTime.replace('T', ' ').substring(0, dateTime.indexOf('+'));
-			return formatedDateTime;
-
+			return responseBody;
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
 			return "bad url";
-		} catch (IOException e) { //happens if no internet connection or api is off
-			return "can't connect to the server";
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "bad url";
 		}
+	}
 
+	private Time DeserializeToTime(String json) {
+		Gson g = new Gson();
+		Time time = g.fromJson(json, Time.class);
+		return time;
 	}
 
 	public String[] getTimezones() {
@@ -60,8 +75,7 @@ public class RestService {
 		}
 	}
 
-	public void printTimezones() { //could merge "get" and "print" in one method but
-									//"get" may be usefull standalone
+	public void printTimezones() {
 		String[] timezones = getTimezones();
 		for (String timezone : timezones) {
 			System.out.println(timezone);
