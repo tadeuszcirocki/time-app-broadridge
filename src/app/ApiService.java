@@ -23,12 +23,12 @@ public class ApiService { //service for worldtimeapi.org
 
 	public Time getTime(String timezone) throws Exception {
 		String url = URL + "/timezone/" + timezone;
-		String json = getResponseJson(url);
+		String json = getResponse(url);
 		Time time = DeserializeToTime(json);
 		return time;
 	}
 
-	private String getResponseJson(String url) throws Exception {
+	private String getResponse(String url) throws Exception {
 		HttpURLConnection connection;
 		InputStream response;
 		try {
@@ -54,30 +54,25 @@ public class ApiService { //service for worldtimeapi.org
 		return time;
 	}
 
-	public String[] getTimezones() {
-		String url = "http://worldtimeapi.org/api/timezone/";
+	public String[] getTimezones() throws Exception {
+		String url = URL + "/timezone/";
 		String[] timezones = {};
-		try {
-			InputStream response = new URL(url).openStream();
-			Scanner scanner = new Scanner(response);
-			String responseBody = scanner.useDelimiter("\\A").next();
-			scanner.close();
-			timezones = responseBody.substring(1, responseBody.length() - 1).split(",");
-			return timezones;
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			return timezones;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return timezones;
-		}
+		String response = getResponse(url);
+		timezones = response.substring(1, response.length() - 1).split(",");
+		return timezones;
 	}
 
 	public void printTimezones() {
-		String[] timezones = getTimezones();
-		for (String timezone : timezones) {
-			System.out.println(timezone);
+		String[] timezones;
+		try {
+			timezones = getTimezones();
+			for (String timezone : timezones) {
+				System.out.println(timezone);
+			}
+		} catch (Exception e) {
+			System.out.println("Error: can't load timezones");
 		}
+
 	}
 
 }
