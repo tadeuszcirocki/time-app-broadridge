@@ -42,10 +42,8 @@ public class ApiService { //service for worldtimeapi.org
 			scanner.close();
 			return responseBody;
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
 			return "bad url";
 		} catch (IOException e) {
-			e.printStackTrace();
 			return "bad url";
 		}
 	}
